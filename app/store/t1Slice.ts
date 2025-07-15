@@ -22,16 +22,16 @@ const t1Slice = createSlice({
     initialState,
     reducers: {
         setInitialData(state, action: PayloadAction<T1DataPoint[]>) {
+            console.log('initial called', action.payload.length)
             state.rawData = action.payload;
             state.loading = false;
             state.error = null;
         },
         addLiveData(state, action: PayloadAction<T1DataPoint>) {
             state.rawData.push(action.payload);
-
-            //only 3 days of data in seconds
             const threeDaysAgo = Date.now() - 3 * 24 * 60 * 60 * 1000;
-            state.rawData = state.rawData.filter((element) => element.timestamp >= threeDaysAgo);
+            //only 3 days of data in seconds
+            state.rawData = state.rawData.filter(element => element.timestamp >= threeDaysAgo);
         },
         setLoading(state, action: PayloadAction<boolean>) {
             state.loading = action.payload;

@@ -1,4 +1,4 @@
-import { call, put, take, takeLatest } from 'redux-saga/effects';
+import { call, put, take, fork, delay } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import { setInitialData, addLiveData, setError, setLoading } from './t1Slice';
 import { T1DataPoint } from './t1Slice';
@@ -32,10 +32,32 @@ function* loadingInitialData() {
 }
 
 function* listenForLiveData() {
-    const channel = yield call(createWebSocketChannel);
+    const channel:[] = yield call(createWebSocketChannel);
+    const buffer: T1DataPoint[] = [];
+
     while (true) {
         const data: T1DataPoint = yield take(channel);
-        yield put(addLiveData(data));
+        buffer.push(data);
+
+        if(buffer.length === 1){
+            yield fork(processBatchEvery, buffer, 2000);
+        }
+        // yield put(addLiveData(data));
+    }
+}
+
+function* processBatchEvery(buffer: T1DataPoint[], intervalMs: number) {
+    while(true) {
+        yield delay(intervalMs);
+
+        if(buffer.length > 0) {
+            const batch = [...buffer];
+            buffer.length = 0;
+
+            for(const point of batch) {
+                yield put(addLiveData(point));
+            }
+        }
     }
 }
 
