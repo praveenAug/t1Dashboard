@@ -40,7 +40,7 @@ function* listenForLiveData() {
         buffer.push(data);
 
         if(buffer.length === 1){
-            yield fork(processBatchEvery, buffer, 2000);
+            yield fork(processBatchEvery, buffer, 10000);
         }
         // yield put(addLiveData(data));
     }
