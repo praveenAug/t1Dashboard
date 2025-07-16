@@ -1,6 +1,7 @@
 {
   "name": "t1-dashboard",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -25,6 +26,8 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
@@ -33,9 +36,13 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/redux-mock-store": "^1.5.0",
+    "babel-jest": "^30.0.4",
     "jest": "^30.0.4",
     "jest-environment-jsdom": "^30.0.4",
+    "redux-mock-store": "^1.5.5",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.8.3"
   }
 }

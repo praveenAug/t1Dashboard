@@ -3,11 +3,15 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store';
-import ReactECharts from 'echarts-for-react';
 import dayjs from 'dayjs';
 import { aggregateByTime } from '../utils/aggregate';
 import { setInitialData, T1DataPoint } from '../store/t1Slice';
 import { useHasHydrated } from '../hooks/useHasHydrated';
+import dynamic from 'next/dynamic';
+
+const ReactECharts = dynamic(() => import('echarts-for-react'), {
+    ssr: false
+});
 
 type ZoomLevel = 'hour' | 'minute' | 'second';
 
@@ -28,9 +32,7 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
     const rawData = useSelector((state: RootState) => state.t1.rawData);
     const loading = useSelector((state: RootState) => state.t1.loading);
     const error = useSelector((state: RootState) => state.t1.error);
-    console.log('rawDatamll', rawData);
     const [zoomLevel, setZoomLevel] = useState<ZoomLevel>('hour');
-    const [dataZoomRange, setDataZoomRange] = useState({ start: 90, end: 100 });
 
     useEffect(() => {
         if (initialData?.length) {
@@ -42,25 +44,15 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
         console.log('rawdata length now', rawData.length);
     }, [])
 
-    const hydratedData = useMemo(() => {
-        if (!hasHydrated) return [];
-        return rawData.map(pt => [dayjs(pt.timestamp).toISOString(), pt.value])
-    }, [hasHydrated, rawData]);
-
     const onDataZoom = (e: any) => {
         const startTime = e.batch?.[0]?.start ?? e.start;
         const endTime = e.batch?.[0]?.end ?? e.end;
 
         if (startTime != null || endTime != null) {
-            // const diffPercent = endTime - startTime;
-
             const diffMs = endTime - startTime;
-
             const newZoomLevel: ZoomLevel = diffMs < 3 * 60 * 1000 ? 'second' :
                 diffMs < 3 * 60 * 60 * 1000 ? 'minute' : 'hour';
-
             setZoomLevel(newZoomLevel);
-            // setDataZoomRange({ start: startTime, end: endTime });
         }
     }
 
@@ -73,19 +65,6 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
         ]);
     }, [rawData, zoomLevel])
 
-    // const chartData = useMemo(() => {
-    //     return rawData.map((point) => [
-    //         dayjs(point.timestamp).toISOString(), //x-axis time
-    //         point.value, //y-axis
-    //     ]);
-    // }, [rawData, zoomLevel]);
-    // const now = Date.now();
-    // const testData = [
-    //     { timestamp: now, value: 1.1 },
-    //     { timestamp: now + 1000, value: 1.2 },
-    //     { timestamp: now + 2000, value: 1.3 },
-    // ]
-    // console.log(aggregateByTime(testData, 1000))
     const option = useMemo(() => ({
         title: {
             text: 'T1 Temperature',
