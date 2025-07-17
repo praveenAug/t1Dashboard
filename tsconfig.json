@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "jsx": "react", // Important to process JSX
-    "module": "commonjs",
+    "jsx": "preserve",
+    "module": "esnext",
     "target": "ES2017",
     "lib": [
       "dom",
@@ -13,7 +13,7 @@
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "incremental": true,

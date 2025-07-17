@@ -114,6 +114,7 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
     if (!rawData.length) return <div>No data Available</div>
     return (
         <ReactECharts
+            data-testid="echarts" 
             option={option}
             style={{ height: 400, width: '100%' }}
             onEvents={{ datazoom: onDataZoom }}
