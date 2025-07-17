@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    legacyBrowsers: false,
-  }
+  //add here
 };
 
 export default nextConfig;
