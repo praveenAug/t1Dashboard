@@ -59,11 +59,13 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
     //aggrate data bsed on zoom level
     const aggregateData = useMemo(() => {
         const resolution = getResolutionForZoom(zoomLevel);
-        return aggregateByTime(rawData, resolution).map(([timestamp, value]) => [
-            dayjs(timestamp).toISOString(), //x-axis time
-            value,//y-axis
-        ]);
-    }, [rawData, zoomLevel])
+        const grouped = aggregateByTime(rawData, resolution);
+        return grouped.map(([timestamp, temperature, humidity]) => ({
+            timestamp,
+            temperature,
+            humidity,
+        }));
+    }, [rawData, zoomLevel]);
 
     const option = useMemo(() => ({
         title: {
@@ -80,12 +82,21 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
             type: 'time',
             name: 'Time',
         },
-        yAxis: {
-            type: 'value',
-            name: 'T1 (C)',
-            min: -5,
-            max: 5,
-        },
+        yAxis: [
+            {
+                type: 'value',
+                name: 'Temperature (°C)',
+                min: -5,
+                max: 5,
+            },
+            {
+                type: 'value',
+                name: 'Humidity (%)',
+                min: 20,
+                max: 100,
+            }
+        ],
+
         dataZoom: [
             {
                 type: 'slider',
@@ -100,13 +111,22 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
         ],
         series: [
             {
-                name: 'T1 Temperature',
+                name: 'Temperature (°C)',
                 type: 'line',
+                yAxisIndex: 0,
                 showSymbol: false,
                 smooth: true,
-                data: aggregateData,
+                data: aggregateData.map(d => [d.timestamp, d.temperature]),
+            },
+            {
+                name: 'Humidity (%)',
+                type: 'line',
+                yAxisIndex: 1,
+                showSymbol: false,
+                smooth: true,
+                data: aggregateData.map(d => [d.timestamp, d.humidity]),
             }
-        ]
+        ],
     }), [aggregateData]);
     if (!hasHydrated) return null;
     if (loading) return <div>Loading...</div>;
@@ -114,7 +134,7 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
     if (!rawData.length) return <div>No data Available</div>
     return (
         <ReactECharts
-            data-testid="echarts" 
+            data-testid="echarts"
             option={option}
             style={{ height: 400, width: '100%' }}
             onEvents={{ datazoom: onDataZoom }}

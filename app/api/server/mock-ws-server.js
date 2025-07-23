@@ -6,7 +6,8 @@ console.log('server running on 4000');
 function createDataPoint() {
     return JSON.stringify({
         timestamp: new Date().toISOString(),
-        value: parseFloat((Math.random() * 10 - 5).toFixed(2)),
+        temperature: parseFloat((Math.random() * 10 - 5).toFixed(2)),
+        humidity: parseFloat((Math.random() * 50 + 30).toFixed(2))
     });
 }
 
@@ -16,8 +17,9 @@ wss.on('connection', (ws) => {
     const totalSec = 72 * 60 * 60;
     for (let i = 0; i < totalSec; i++) {
         const timestamp = new Date(now + i * 1000).toString();
-        const value = parseFloat((Math.random() * 10 - 5).toFixed(2))
-        ws.send(JSON.stringify({ timestamp, value }));
+        const temperature = parseFloat((Math.random() * 10 - 5).toFixed(2));
+        const humidity = parseFloat((Math.random() * 50 + 30).toFixed(2));
+        ws.send(JSON.stringify({ timestamp, temperature, humidity }));
     }
 
     //send data every second
