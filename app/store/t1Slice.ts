@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 export interface T1DataPoint {
     timestamp: number;
     value: number;
+    humidityVal: number
 }
 
 interface T1State {
@@ -22,7 +23,6 @@ const t1Slice = createSlice({
     initialState,
     reducers: {
         setInitialData(state, action: PayloadAction<T1DataPoint[]>) {
-            console.log('initial called', action.payload.length)
             state.rawData = action.payload;
             state.loading = false;
             state.error = null;

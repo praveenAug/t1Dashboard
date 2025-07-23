@@ -7,6 +7,7 @@ function createDataPoint() {
     return JSON.stringify({
         timestamp: new Date().toISOString(),
         value: parseFloat((Math.random() * 10 - 5).toFixed(2)),
+        humidityVal: parseFloat((Math.random() * 10 - 5).toFixed(2)),
     });
 }
 
@@ -17,7 +18,8 @@ wss.on('connection', (ws) => {
     for (let i = 0; i < totalSec; i++) {
         const timestamp = new Date(now + i * 1000).toString();
         const value = parseFloat((Math.random() * 10 - 5).toFixed(2))
-        ws.send(JSON.stringify({ timestamp, value }));
+        const humidityVal = parseFloat((Math.random() * 10 - 5).toFixed(2))
+        ws.send(JSON.stringify({ timestamp, value, humidityVal }));
     }
 
     //send data every second

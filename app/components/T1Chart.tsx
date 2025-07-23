@@ -38,11 +38,7 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
         if (initialData?.length) {
             dispatch(setInitialData(initialData))
         }
-    }, [])
-
-    useEffect(() => {
-        console.log('rawdata length now', rawData.length);
-    }, [])
+    }, [initialData, dispatch])
 
     const onDataZoom = (e: any) => {
         const startTime = e.batch?.[0]?.start ?? e.start;
@@ -59,11 +55,14 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
     //aggrate data bsed on zoom level
     const aggregateData = useMemo(() => {
         const resolution = getResolutionForZoom(zoomLevel);
-        return aggregateByTime(rawData, resolution).map(([timestamp, value]) => [
+        return aggregateByTime(rawData, resolution).map(([timestamp, value, humidityVal]) => [
             dayjs(timestamp).toISOString(), //x-axis time
             value,//y-axis
+            humidityVal,
         ]);
     }, [rawData, zoomLevel])
+
+    console.log('aggregateData', aggregateData)
 
     const option = useMemo(() => ({
         title: {
@@ -73,7 +72,7 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
             trigger: 'axis',
             formatter: (params: any) => {
                 const p = params[0];
-                return `${dayjs(p.data[0]).format('HH:mm:ss')}<br/>T1: ${p.data[1].toFixed(2)}C`;
+                return `${dayjs(p.data[0]).format('HH:mm:ss')}<br/>T1: ${p.data[1].toFixed(2)}C<br/> humidity: ${p.data[2].toFixed(2)}`;
             },
         },
         xAxis: {
@@ -105,7 +104,14 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
                 showSymbol: false,
                 smooth: true,
                 data: aggregateData,
-            }
+            },
+            {
+                name: 'Humidity',
+                type: 'line',
+                showSymbol: false,
+                smooth: true,
+                data: aggregateData,
+            },
         ]
     }), [aggregateData]);
     if (!hasHydrated) return null;
@@ -114,7 +120,7 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
     if (!rawData.length) return <div>No data Available</div>
     return (
         <ReactECharts
-            data-testid="echarts" 
+            data-testid="echarts"
             option={option}
             style={{ height: 400, width: '100%' }}
             onEvents={{ datazoom: onDataZoom }}
