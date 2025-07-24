@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 type T1DataPoint = {
     timestamp: number;
     value: number;
+    humidityVal: number;
 };
 
 export async function GET() {
@@ -14,8 +15,8 @@ export async function GET() {
         length: totalPoints
     }, (_, i) => ({
         timestamp: now - (totalPoints - i) * intervalMs,
-        value: parseFloat((Math.random() * 10 - 5).toFixed(2))
+        value: parseFloat((Math.random() * 10 - 5).toFixed(2)),
+        humidityVal: parseFloat((Math.random() * 10 - 5).toFixed(2))
     }));
-console.log('datallkk', data)
     return NextResponse.json(data);
 }
