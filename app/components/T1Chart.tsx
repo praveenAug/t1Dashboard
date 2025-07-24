@@ -38,11 +38,7 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
         if (initialData?.length) {
             dispatch(setInitialData(initialData))
         }
-    }, [])
-
-    useEffect(() => {
-        console.log('rawdata length now', rawData.length);
-    }, [])
+    }, [initialData, dispatch])
 
     const onDataZoom = (e: any) => {
         const startTime = e.batch?.[0]?.start ?? e.start;
@@ -67,6 +63,8 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
         }));
     }, [rawData, zoomLevel]);
 
+    console.log('aggregateData', aggregateData)
+
     const option = useMemo(() => ({
         title: {
             text: 'T1 Temperature',
@@ -75,7 +73,7 @@ const T1Chart: React.FC<T1ChartProps> = ({ initialData }) => {
             trigger: 'axis',
             formatter: (params: any) => {
                 const p = params[0];
-                return `${dayjs(p.data[0]).format('HH:mm:ss')}<br/>T1: ${p.data[1].toFixed(2)}C`;
+                return `${dayjs(p.data[0]).format('HH:mm:ss')}<br/>T1: ${p.data[1].toFixed(2)}C<br/> humidity: ${p.data[2].toFixed(2)}`;
             },
         },
         xAxis: {
