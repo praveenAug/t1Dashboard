@@ -2,8 +2,8 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface T1DataPoint {
     timestamp: number;
-    value: number;
-    humidityVal: number
+    temperature: number;
+    humidity: number;
 }
 
 interface T1State {

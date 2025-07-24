@@ -11,13 +11,18 @@ function createWebSocketChannel() {
     return eventChannel<T1DataPoint>((emitter) => {
         const ws = new WebSocket('ws://localhost:4000/t1');
         ws.onmessage = (event) => {
-            const parsed: T1DataPoint = JSON.parse(event.data);
-            emitter(parsed);
+            const parsed = JSON.parse(event.data);
+            emitter({
+                timestamp: new Date(parsed.timestamp).getTime(),
+                temperature: parsed.temperature,
+                humidity: parsed.humidity
+            });
         };
         ws.onerror = (e) => console.error('WebSocket error', e);
         return () => ws.close();
     });
 }
+
 
 function* loadingInitialData() {
     try {
@@ -32,14 +37,14 @@ function* loadingInitialData() {
 }
 
 function* listenForLiveData() {
-    const channel:[] = yield call(createWebSocketChannel);
+    const channel: [] = yield call(createWebSocketChannel);
     const buffer: T1DataPoint[] = [];
 
     while (true) {
         const data: T1DataPoint = yield take(channel);
         buffer.push(data);
 
-        if(buffer.length === 1){
+        if (buffer.length === 1) {
             yield fork(processBatchEvery, buffer, 10000);
         }
         // yield put(addLiveData(data));
@@ -47,14 +52,14 @@ function* listenForLiveData() {
 }
 
 function* processBatchEvery(buffer: T1DataPoint[], intervalMs: number) {
-    while(true) {
+    while (true) {
         yield delay(intervalMs);
 
-        if(buffer.length > 0) {
+        if (buffer.length > 0) {
             const batch = [...buffer];
             buffer.length = 0;
 
-            for(const point of batch) {
+            for (const point of batch) {
                 yield put(addLiveData(point));
             }
         }
